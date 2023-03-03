@@ -73,7 +73,7 @@ Route::get('error/logs/{id}', 'Api\v1\ErrorLogController@listErrorLog');
 // forgot password
 Route::post('forgot/password', 'Api\v1\UserController@forgotPassword');
 Route::post('/generate/newPassword/', 'Api\v1\UserController@newPassword');
-Route::get('/forgotPassword/verify', 'Api\v1\UserController@forgotPasswordCodeVerify');
+Route::get('/forgotPassword/verify/{code}', 'Api\v1\UserController@forgotPasswordCodeVerify');
 
 //send message
 Route::post('/send/message/', 'Api\v1\DashboardController@sendMessage');
@@ -166,7 +166,8 @@ Route::group(['middleware' => 'auth:api'], function () use ($router) {
     Route::get('staff/{id}/patient', 'Api\v1\StaffPatientController@patientList');
     Route::get('staff/appointment', 'Api\v1\StaffPatientController@appointmentList');
     Route::get('staff/{id}/appointment', 'Api\v1\StaffPatientController@appointmentList');
-
+     // Staff Client Locations
+    Route::get('locations', 'Api\v1\StaffController@getLocation');
 
     Route::get('patient/appointment', 'Api\v1\StaffPatientController@patientAppointment');
     Route::get('patient/{id}/appointment', 'Api\v1\StaffPatientController@patientAppointment');

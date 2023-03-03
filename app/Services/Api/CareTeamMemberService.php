@@ -24,14 +24,10 @@ class CareTeamMemberService
             $careTeamId = Helper::tableName('App\Models\Client\CareTeam', $request->careTeamId);
             $careTeam = CareTeam::find($careTeamId);
             if (!$careTeam) {
-                return response()->json(['message' => trans('messages.UUID_NOT_FOUND')],404);
+                return response()->json(['message' => trans('messages.UUID_NOT_FOUND')], 404);
             }
-            //  CareTeamMember::where(['careTeamId' => $careTeam->id])->update(['isHead' => 0]);
-            $setData = (new CareTeamService)->addMember($request, $careTeam);
-            if ($setData) {
-                return response()->json(['message' => trans('messages.CREATED_SUCCESS')]);
-            }
-            return response()->json(['message' => trans('messages.INTERNAL_ERROR')],500);
+            return (new CareTeamService)->addMember($request, $careTeam);
+
         } catch (\Exception $e) {
             throw new \RuntimeException($e);
         }
@@ -58,7 +54,7 @@ class CareTeamMemberService
             $contactId = Helper::tableName('App\Models\Contact\Contact', $id);
             $Contact = Contact::find($contactId);
             if (!$Contact) {
-                return response()->json(['message' => trans('messages.UUID_NOT_FOUND')],404);
+                return response()->json(['message' => trans('messages.UUID_NOT_FOUND')], 404);
             }
             $CareTeamMember = CareTeamMember::where(['contactId' => $contactId]);
             $CareTeamMember = $CareTeamMember->orderByDesc('id')->paginate(env('PER_PAGE', 20));
@@ -74,7 +70,7 @@ class CareTeamMemberService
             $careTeamId = Helper::tableName('App\Models\Client\CareTeam', $id);
             $careTeam = CareTeam::find($careTeamId);
             if (!$careTeam) {
-                return response()->json(['message' => trans('messages.UUID_NOT_FOUND')],404);
+                return response()->json(['message' => trans('messages.UUID_NOT_FOUND')], 404);
             }
             $CareTeamMember = CareTeamMember::with('contact')
                 ->where(['careTeamId' => $careTeamId]);
@@ -92,7 +88,7 @@ class CareTeamMemberService
             $input = $this->deleteInputs();
             $CareTeamMember = CareTeamMember::where(['udid' => $id])->first();
             if (!$CareTeamMember) {
-                return response()->json(['message' => trans('messages.UUID_NOT_FOUND')],404);
+                return response()->json(['message' => trans('messages.UUID_NOT_FOUND')], 404);
             }
             $changeLog = [
                 'udid' => Str::uuid()->toString(), 'table' => 'care_teams', 'tableId' => $CareTeamMember->id,
@@ -104,7 +100,7 @@ class CareTeamMemberService
             AssignProgram::where(['referenceId' => $CareTeamMember->udid, 'entityType' => 'CareTeamMember'])->delete();
             $CareTeamMember = $CareTeamMember->dataSoftDelete($id, $input);
             if (!$CareTeamMember) {
-                return response()->json(['message' => trans('messages.INTERNAL_ERROR')],500);
+                return response()->json(['message' => trans('messages.INTERNAL_ERROR')], 500);
             }
             return response()->json(['message' => trans('messages.deletedSuccesfully')]);
         } catch (\Exception $e) {

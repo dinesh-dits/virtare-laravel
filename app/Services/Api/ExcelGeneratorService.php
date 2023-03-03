@@ -3405,7 +3405,7 @@ class ExcelGeneratorService
     {
         $headingFrom = "A1"; // or any value
         $headingTo = "D1"; // or any value
-        $sheet->setCellValue('A1', 'Blood Oxygen Saturation')->mergeCells('A1:D1');
+        $sheet->setCellValue('A1', 'Blood Pressure')->mergeCells('A1:D1');
         $sheet->getStyle('A1')->getFont()->setSize(16);
         $sheet->getStyle("$headingFrom:$headingTo")->getAlignment()->setHorizontal('center');
         $sheet->getStyle("$headingFrom:$headingTo")->getFont()->setBold(true);

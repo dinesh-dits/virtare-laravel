@@ -354,7 +354,7 @@ class ProviderService
             $careteams = CareTeam::where(['isActive' => 1]);
             if (auth()->user()->roleId != 1) {
                 $client = Staff::where(['userId' => Auth::id()])->get('clientId');
-                $careteams = $careteams->whereIn('clientId', $client)->get('id');
+                $careteams = $careteams->whereIn('clientId', $client);
             }
             if ($request->search) {
                 $careteams->where('name', 'LIKE', '%' . $request->search . '%');
@@ -400,7 +400,7 @@ class ProviderService
                 return response()->json(['message' => trans('messages.unauthenticated')], 401);
             }*/
         } catch (Exception $e) {
-            echo $e->getMessage().''.$e->getLine();
+            echo $e->getMessage() . '' . $e->getLine();
             //throw new \RuntimeException($e);
             throw $e;
         }

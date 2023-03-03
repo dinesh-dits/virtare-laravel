@@ -720,14 +720,13 @@ class AppointmentService
             );
             return fractal()->collection($data)->transformWith(new AppointmentSearchTransformer())->toArray();
         } catch (Exception $e) {
-            echo $e->getMessage();
             if (isset(auth()->user()->id)) {
                 $userId = auth()->user()->id;
             } else {
                 $userId = "";
             }
             ErrorLogGenerator::createLog($request, $e, $userId);
-           // throw new \RuntimeException($e);
+            throw new \RuntimeException($e);
         }
     }
 

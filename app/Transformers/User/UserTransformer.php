@@ -42,6 +42,7 @@ class UserTransformer extends TransformerAbstract
             'firstName' => @$user->staff ? @$user->staff->firstName : @$user->familyMember->fullName,
             'lastName' => @$user->staff ? @$user->staff->lastName : @$user->familyMember->fullName,
             'username' => $user->email,
+            'title' => @$user->staff->title,
             'email' => $user->email,
             'profile_photo' => (!empty($user->profilePhoto)) && (!is_null($user->profilePhoto)) ? Storage::disk('s3')->temporaryUrl($user->profilePhoto, Carbon::now()->addDays(5)) : "",
             'profilePhoto' => (!empty($user->profilePhoto)) && (!is_null($user->profilePhoto)) ? Storage::disk('s3')->temporaryUrl($user->profilePhoto, Carbon::now()->addDays(5)) : "",

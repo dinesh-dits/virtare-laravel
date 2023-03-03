@@ -380,7 +380,10 @@ class CareTeamService
                     if (!$careTeamMember) {
                         return response()->json(['message' => trans('messages.INTERNAL_ERROR')], 500);
                     }
-                    return $careTeamMember;
+                    if ($careTeamMember) {
+                        return response()->json(['message' => trans('messages.CREATED_SUCCESS')]);
+                    }
+                    return response()->json(['message' => trans('messages.INTERNAL_ERROR')], 500);
                 }
             } else {
                 return 1;
@@ -403,7 +406,10 @@ class CareTeamService
             ];
             $careTeamMember = new CareTeamMember();
             $careTeamMember = $careTeamMember->storeData($data);
-            return $careTeamMember;
+            if ($careTeamMember) {
+                return response()->json(['message' => trans('messages.CREATED_SUCCESS')]);
+            }
+            return response()->json(['message' => trans('messages.INTERNAL_ERROR')], 500);
         }
     }
 

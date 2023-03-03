@@ -377,7 +377,7 @@ class UserService
     }
 
     // Forget Password
-    public function forgotPassword(Request $request)
+    public function forgotPassword($request)
     {
         try {
 
@@ -418,32 +418,8 @@ class UserService
             if (empty($email) && empty($phone)) {
                 return response()->json(['message' => "Required Email"], 500);
             }
-
+           
             if ($result && isset($result->udid)) {
-                $code = Helper::randomString(50);
-                $base_url = env('APP_URL', null);
-                if ($base_url == null) {
-                    $base_url = URL();
-                }
-                $forgetToken = [
-                    'forgetToken' => $code,
-                    'providerId' => $providerId,
-                    'providerLocationId' => $providerLocation
-                ];
-                User::where("udid", $result->udid)->update($forgetToken);
-                $forgotUrl = $base_url . "#/setup-password?code=" . $code;
-                $variablesArr = array(
-                    "forgotUrl" => $forgotUrl
-                );
-                if (isset($result->phoneNumber)) {
-                    $msgSMSObj = ConfigMessage::where("type", "forgotPassword")
-                        ->where("entityType", "sendSMS")
-                        ->first();
-                    if (isset($msgSMSObj->messageBody)) {
-                        $messageBody = $msgSMSObj->messageBody;
-                        Helper::getMessageBody($messageBody, $variablesArr);
-                    }
-                }
                 $emailData = [
                     'email' => $result->email,
                     'firstName' => $result->firstName,
@@ -460,7 +436,7 @@ class UserService
     }
 
     // New Password
-    public function newPassword(Request $request)
+    public function newPassword($request)
     {
         try {
             $providerId = Helper::providerId();
@@ -509,12 +485,11 @@ class UserService
     }
 
     // Forget Password Code Verify
-    public function forgotPasswordCodeVerify(Request $request)
+    public function forgotPasswordCodeVerify($request,$code)
     {
         try {
-            $get = $request->all();
-            if (isset($get["code"]) && !empty($get["code"])) {
-                $result = User::where('forgetToken', $get["code"])->first();
+            if (isset($code) && !empty($code)) {
+                $result = User::where('forgetToken', $code)->first();
                 if (isset($result->forgetToken)) {
                     if ($result->forgetToken !== null || $result->forgetToken !== "") {
                         return response()->json(['data' => true, 'message' => trans('messages.code_exist')]);

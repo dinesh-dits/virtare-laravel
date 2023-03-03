@@ -366,11 +366,23 @@ class ClientService
             $client['contractTypeId'] = $request->contractTypeId;
         }
         if ($request->startDate) {
-            $startDate = Helper::dateOnly($request->startDate);
+            $ipInfo = file_get_contents('http://ip-api.com/json/' . $request->ip());
+            $ipInfo = json_decode($ipInfo);
+            $timezone = 'UTC';
+            if (isset($ipInfo->timezone)) {
+                $timezone = $ipInfo->timezone;
+            }
+            $startDate = Helper::dateOnly($request->startDate, $timezone);
             $client['startDate'] = $startDate;
         }
         if ($request->endDate) {
-            $endDate = Helper::dateOnly($request->endDate);
+            $ipInfo = file_get_contents('http://ip-api.com/json/' . $request->ip());
+            $ipInfo = json_decode($ipInfo);
+            $timezone = 'UTC';
+            if (isset($ipInfo->timezone)) {
+                $timezone = $ipInfo->timezone;
+            }
+            $endDate = Helper::dateOnly($request->endDate, $timezone);
             $client['endDate'] = $endDate;
         }
         $client['updatedBy'] = Auth::id();
@@ -499,8 +511,12 @@ class ClientService
                     $patients = PatientProvider::with('patients')->whereIn('providerId', $CareTeamId)->get();
                     $count = 1;
                     foreach ($patients as $key => $patient) {
-                        $flag = $this->patientFlag($patient->patients->id);
-                        $flag = explode('@', $flag);
+                        if (isset($patient->patients)) {
+                            $flag = $this->patientFlag($patient->patients->id);
+                            $flag = explode('@', $flag);
+                        } else {
+                            $flag = array();
+                        }
                         $aptients[$key]['status'] = isset($flag[0]) ? $flag[0] : '';
                         $aptients[$key]['statusAlt'] = isset($flag[1]) ? $flag[1] : '';
                         $aptients[$key]['name'] = $patient->patients->firstName . ' ' . $patient->patients->lastName;

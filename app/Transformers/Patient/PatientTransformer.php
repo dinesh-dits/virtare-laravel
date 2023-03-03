@@ -44,23 +44,18 @@ class PatientTransformer extends TransformerAbstract
                 $query->where('patientFlags.createdAt', '>=', $fromDateStr)->orWhereNull('patientFlags.deletedAt');
             })->withTrashed();
         }
-        if (
-            request()->filter == 'Escalation' || request()->filter == 'Critical' || request()->filter == 'Moderate' || request()->filter == 'WNL'
-            || request()->filter == 'Watchlist' || request()->filter == 'Trending' || request()->filter == 'Message' || request()->filter == 'Communication' || request()->filter == 'Work Status'
-        ) {
+        $filter = ['Escalation', 'Critical', 'Moderate', 'WNL', 'Watchlist', 'Trending', 'Message', 'Communication'];
+        if (in_array(request()->filter, $filter)) {
             $flag->whereHas('flag', function ($query) {
                 $query->where('name', request()->filter);
             })->withTrashed();
         } else {
-            $flag->leftJoin('flags', 'flags.id', '=', 'patientFlags.flagId')->whereIn('flags.id', [7, 8, 9]);
+            $flag->whereIn('patientFlags.flagId', [7, 8, 9]);
         }
-
         $flag = $flag->where('patientFlags.patientId', $data->id)->orderBy('patientFlags.id', 'DESC')->first();
-
         if (empty($flag)) {
             $flag = '';
         }
-
 
         $vitals = $data->vitals_list($data->id);
         if ($data->family) {
@@ -75,7 +70,6 @@ class PatientTransformer extends TransformerAbstract
         //print_r($data);
         //$detail = fractal()->item($data)->transformWith(new PatientDetailTransformer())->toArray();
         $detail = fractal()->item($data)->transformWith(new PatientBasicDetailTransformer($this->showData))->toArray();
-
         $otherDetail = [
             'patientFullName' => str_replace("  ", " ", ucfirst($data->lastName) . ',' . ' ' . ucfirst($data->firstName) . ' ' . ucfirst($data->middleName)),
             'lastReadingDate' => $data ? strtotime(Helper::lastReading($data->id)) : '',

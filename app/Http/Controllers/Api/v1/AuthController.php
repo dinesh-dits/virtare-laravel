@@ -136,11 +136,14 @@ class AuthController extends Controller
             UserDeviceToken::where('userId', Auth::id())->update($inputUpdate);
             UserDeviceToken::where('userId', Auth::id())->delete();
 
+            $log['udid'] = Str::uuid()->toString();
             $log['login_id'] = Auth::user()->email;
             $log['platform'] = '';
             $log['browser'] = '';
             $log['ip_address'] = $request->ip();
             $log['type'] = 'Log Out';
+            $log['attempt'] = 'success';
+            $log['message'] = 'Logout Success';
             $log['date'] = date('Y-m-d H:i:s', time());
             LoginLogs::create($log);
             return (new LoginService)->logout($request);

@@ -1173,10 +1173,7 @@ class Helper
                     'Variables' => json_decode($variable, true)
                 ]]
             ];
-            //print_r($body);
-            //die;
-            $response = $mj->post(Resources::$Email, ['body' => $body]);
-//            $response->success() && var_dump($response->getData());
+            return $mj->post(Resources::$Email, ['body' => $body]);
         }
     }
 

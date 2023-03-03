@@ -30,9 +30,10 @@ class InventoryService
                 'createdBy' => Auth::id(),
                 'isActive' => $isActive == true ? 1 : 0,
                 'providerId' => $provider,
-                'macAddress' => trim($request->macAddress),
+                'macAddress' => trim($request->serialNumber),
                 'manufactureId' => $request->manufactureId,
-                'serialNumber' => $request->serialNumber,
+                //'serialNumber' => $request->serialNumber,
+                'serialNumber' => '',
                 'networkId' => $request->networkId,
                 'deviceModelId' => $deviceModelId->id,
             ];

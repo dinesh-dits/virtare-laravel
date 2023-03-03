@@ -58,7 +58,7 @@ class CareTeamListTransformer extends TransformerAbstract
         return [
             'udid' => @$data->udid,
             'name' => @$data->name,
-            // 'site' => $this->getSiteName($data->id),
+            'site' => $this->getSiteName($data->id),
             'patients' => $this->getPatients($data->udid),
             'teamHeadId' => @$data->headName(@$data->head->contactId)->teamHeadId,
             'teamHead' => ((isset($data->head->contactId)) ? $this->siteHead($data->head->contactId) : ''),

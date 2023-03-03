@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Services\Api\UserService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Password\CurrentPasswordRequest;
+use App\Http\Requests\Auth\CodeRequest;  
+use App\Http\Requests\Auth\NewPasswordRequest;  
+use App\Http\Requests\Auth\EmailRequest;
 
 class UserController extends Controller
 {
@@ -41,21 +44,21 @@ class UserController extends Controller
   }
 
   // Forget Password
-  public function forgotPassword(Request $request)
+  public function forgotPassword(EmailRequest $request)
   {
     return (new UserService)->forgotPassword($request);
   }
 
   // New Password
-  public function newPassword(Request $request)
+  public function newPassword(NewPasswordRequest $request)
   {
     return (new UserService)->newPassword($request);
   }
 
   // Forget Password Code Verify
-  public function forgotPasswordCodeVerify(Request $request)
+  public function forgotPasswordCodeVerify(Request $request,$code)
   {
-    return (new UserService)->forgotPasswordCodeVerify($request);
+    return (new UserService)->forgotPasswordCodeVerify($request,$code);
   }
 
   // Test Mail

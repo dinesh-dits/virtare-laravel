@@ -34,13 +34,13 @@ class SetUpPasswordListener
             if ($base_url == null) {
                 $base_url = URL();
             }
-            $forgotUrl = $base_url . "#/setup-password?code=" . $code;
+            $forgotUrl = $base_url . "#/setup-password/" . $code;
             if ($event->data['email']) {
-                $variable["name"] = $event->data['firstName'];
+                $variable["name"] = (($event->data['firstName']) ?: 'User');
                 $variable["url"] = $forgotUrl;
                 $userDetail['email'] = $event->data['email'];
-                $userDetail['name'] = $event->data['firstName'];
-                Helper::sendMailTemplate($event->data['template_name'], json_encode($variable), $userDetail);
+                $userDetail['name'] = (($event->data['firstName']) ?: 'User');
+               Helper::sendMailTemplate($event->data['template_name'], json_encode($variable), $userDetail);
             }
         }
     }

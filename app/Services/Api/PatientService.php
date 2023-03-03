@@ -93,7 +93,6 @@ class PatientService
         try {
             // $patient = Patient::where('id',98)->first();
             // event(new PateientIntakeEvent($patient));
-
             $providerId = Helper::providerId();
             $providerLocation = Helper::providerLocationId();
             $entityType = Helper::entityType();
@@ -346,7 +345,7 @@ class PatientService
                         foreach ($careTeams as $key => $provider) {
                             $defaultProvider[$key] = [
                                 'udid' => Str::uuid()->toString(),
-                                'providerId' => $provider->id,
+                                'providerId' => $provider->udid,
                                 'createdBy' => Auth::id(),
                                 'isDefault' => 0,
                                 'patientId' => $usersId->id
@@ -416,7 +415,6 @@ class PatientService
             } else {
                 $select = array('patients.nonCompliance', 'patients.weight', 'patients.genderId', 'patients.dob', 'patients.id', 'patients.udid', 'patients.firstName', 'patients.middleName', 'patients.lastName', 'patients.userId', 'patients.isActive', 'patients.isApp');
             }
-
             $patient = Patient::select($select)->with('user', 'family', 'emergency', 'vitals', 'flags')
                 ->leftJoin('users', 'users.id', '=', 'patients.userId')
                 ->leftJoin('patientStaffs', 'patientStaffs.patientId', '=', 'patients.id')
@@ -429,6 +427,10 @@ class PatientService
                 ->whereNull('patients.deletedAt')
                 ->whereNull('patientFlags.deletedAt');
 
+            if ($request->headers->has('siteId') && !empty(request()->header('siteId')) && request()->header('siteId') != NULL && request()->header('siteId') != 'undefined') {
+                $careTeam = CareTeam::where(['siteId' => $request->header('siteId')])->get('udid');
+                $patient->whereIn('patientProviders.providerId', $careTeam);
+            }
             // $patient->leftJoin('providers', 'providers.id', '=', 'patientProviders.providerId')->whereNull('providers.deletedAt');
             // $patient->leftJoin('groups', 'groups.groupId', '=', 'patientGroups.groupId')->whereNull('groups.deletedAt');
             // $patient->leftJoin('programs', 'programs.id', '=', 'patients.programId')->where('programs.isActive', 1)->whereNull('programs.deletedAt');
@@ -537,7 +539,7 @@ class PatientService
                     });
                 } elseif (auth()->user()->roleId == 5 || auth()->user()->roleId == 7 || auth()->user()->roleId == 9) {
                     if ($siteHead) {
-                        $careTeam = CareTeam::where(['siteId' => $siteHead->id])->get('udid');
+                        $careTeam = CareTeam::where(['siteId' => $siteHead->udid])->get('udid');
                     } else {
                         $careTeam = CareTeamMember::where(['contactId' => Auth::id()])->get('careTeamId');
                     }
@@ -545,8 +547,6 @@ class PatientService
                 } else {
                     $patient;
                 }
-
-
                 if ($request->search) {
                     if ($request->isActive) {
                         $patient->where([['patients.isActive', 1], [DB::raw("CONCAT(trim(`patients`.`firstName`), ' ', trim(`patients`.`middleName`), ' ', trim(`patients`.`lastName`))"), 'LIKE', "%" . $request->search . "%"]])
@@ -2177,14 +2177,12 @@ class PatientService
                 }
                 if (in_array("7", $vitalFlag)) {
                     $flagId = 7;
-                    $flag1 = [8, 9];
                 } elseif (in_array("8", $vitalFlag)) {
                     $flagId = 8;
-                    $flag1 = [7, 9];
                 } else {
                     $flagId = 9;
-                    $flag1 = [7, 8];
                 }
+                $flag1 = [7, 8, 9];
                 //According to Priority Flag Assigned to patient
 
                 $flagData = PatientFlag::whereIn('flagId', $flag1)->where('patientId', $patientIdx)->first();
@@ -2387,24 +2385,26 @@ class PatientService
                 } else {
                     $flagId = 9;
                 }
+                $flag1 = [7, 8, 9];
+
                 //According to Priority Flag Assigned to patient
-                $flagData = PatientFlag::where('patientId', $patientId)->first();
+                $flagData = PatientFlag::whereIn('flagId', $flag1)->where('patientId', $patientId)->first();
+
                 if ($flagData) {
                     $flagOld = Flag::where('id', $flagData->flagId)->first();
                     $flags = ['deletedBy' => Auth::id(), 'isActive' => 0, 'isDelete' => 1];
-                    PatientFlag::where('patientId', $patientId)->update($flags);
+                    PatientFlag::whereIn('flagId', $flag1)->where('patientId', $patientId)->update($flags);
+
                     $changeLog = [
                         'udid' => Str::uuid()->toString(), 'table' => 'patientFlags', 'tableId' => $flagData->id,
                         'value' => json_encode($flags), 'type' => 'updated', 'ip' => request()->ip(), 'createdBy' => Auth::id()
                     ];
                     ChangeLog::create($changeLog);
-                    PatientFlag::where('patientId', $patientId)->delete();
-
+                    PatientFlag::whereIn('flagId', $flag1)->where('patientId', $patientId)->delete();
                     $flagDataInput = ['udid' => Str::uuid()->toString(), 'patientId' => $patientId, 'flagId' => $flagId, 'icon' => '', 'providerId' => $providerId, 'providerLocationId' => $providerLocation];
                     $flag = PatientFlag::create($flagDataInput);
                     $flagInput = Flag::where('id', $flagId)->first();
                     $userInput = Patient::where('id', auth()->user()->patient->id)->first();
-
                     $flagTimeline = [
                         'patientId' => $patientId, 'heading' => 'Patient Status Flag Assigned', 'title' => 'Flag Changed ' . $flagOld->name . ' -> ' . $flagInput->name . ' ' . '<b>By' . ' ' . $userInput->lastName . ',' . ' ' . $userInput->firstName . ' ' . $userInput->middleName . '</b>', 'type' => 7,
                         'createdBy' => Auth::id(), 'udid' => Str::uuid()->toString(), 'refrenceId' => $flag->id, 'providerId' => $providerId, 'providerLocationId' => $providerLocation

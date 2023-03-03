@@ -9,7 +9,9 @@ use App\Models\User\User;
 use App\Models\Staff\Staff;
 use Illuminate\Support\Str;
 use App\Models\Log\ChangeLog;
+use App\Models\Client\CareTeam;
 use App\Models\Patient\Patient;
+use App\Models\Client\Site\Site;
 use App\Models\Group\StaffGroup;
 use App\Models\UserRole\UserRole;
 use App\Models\Staff\StaffProgram;
@@ -19,19 +21,18 @@ use App\Models\Task\TaskAssignedTo;
 use App\Models\Patient\PatientStaff;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Client\CareTeamMember;
 use App\Models\GlobalCode\GlobalCode;
 use App\Models\Appointment\Appointment;
 use App\Models\Communication\CallRecord;
 use App\Models\StaffContact\StaffContact;
 use App\Models\Communication\Communication;
 use App\Models\ConfigMessage\ConfigMessage;
-use App\Transformers\Group\GroupTransformer;
 use App\Transformers\Staff\StaffTransformer;
 use App\Transformers\Role\UserRoleTransformer;
 use App\Transformers\Patient\PatientTransformer;
 use App\Transformers\Staff\StaffRoleTransformer;
 use App\Models\Staff\StaffProvider\StaffProvider;
-use App\Transformers\Group\StaffGroupTransformer;
 use App\Transformers\Staff\GroupStaffTransformer;
 use App\Models\StaffAvailability\StaffAvailability;
 use App\Transformers\Staff\StaffContactTransformer;
@@ -221,8 +222,26 @@ class StaffService
                     ->leftJoin('staffLocations', 'staffLocations.staffId', '=', 'staffs.id')
                     ->leftJoin('globalCodes as g2', 'g2.id', '=', 'staffs.networkId')
                     ->with('provider');
+                $roleId = [5, 7, 9];
+                if (auth()->user()->roleId == 2) {
+                    $client = Staff::where(['userId' => Auth::id()])->get('clientId');
+                    $careTeam = CareTeam::whereIn('clientId', $client)->get('udid');
+                    $member = CareTeamMember::whereIn('careTeamId', $careTeam)->get('contactId');
+                    $data->whereIn('staffs.userId', $member);
+                } elseif (in_array(auth()->user()->roleId, $roleId)) {
+                    $siteHead = Site::where(['siteHead' => Auth::id()])->first();
+                    if ($siteHead) {
+                        $careTeam = CareTeam::where(['siteId' => $siteHead->udid])->get('udid');
+                        $member = CareTeamMember::whereIn('careTeamId', $careTeam)->get('contactId');
+                        $data->whereIn('staffs.userId', $member);
+                    } else {
+                        $data->whereIn('staffs.userId', Auth::id());
+                    }
+                } else {
+                    $data;
+                }
 
-             /*   $data->leftJoin('providers', 'providers.id', '=', 'staffProviders.providerId')->whereNull('providers.deletedAt')->whereNull('staffProviders.deletedAt');
+                /*   $data->leftJoin('providers', 'providers.id', '=', 'staffProviders.providerId')->whereNull('providers.deletedAt')->whereNull('staffProviders.deletedAt');
                 $data->leftJoin('programs', 'programs.id', '=', 'staffs.programId')->where('programs.isActive', 1)->whereNull('programs.deletedAt');
 
                 $data->leftJoin('providerLocations', function ($join) {
@@ -257,7 +276,7 @@ class StaffService
                         ->orWhere('users.email', 'LIKE', $request->search);
                 }
 
-              /*  if (request()->header('providerId')) {
+                /*  if (request()->header('providerId')) {
                     $provider = Helper::providerId();
                     $data->where('staffProviders.providerId', $provider);
                 }
@@ -310,9 +329,9 @@ class StaffService
                 } else {
                     $data->orderBy('staffs.createdAt', "DESC");
                 }
-               // echo auth()->user()->roleId; die;
+                // echo auth()->user()->roleId; die;
                 if (auth()->user()->roleId == 2) { // Admin
-                  //  print_r(auth()->user()->staff);
+                    //  print_r(auth()->user()->staff);
                     $data->where('staffs.clientId', auth()->user()->staff->clientId);
                 }
 
@@ -324,7 +343,8 @@ class StaffService
                 return fractal()->item($data)->transformWith(new StaffTransformer())->toArray();
             }
         } catch (Exception $e) {
-            echo $e->getMessage(); die;
+            echo $e->getMessage();
+            die;
             throw new \RuntimeException($e);
         }
     }
@@ -480,7 +500,6 @@ class StaffService
         } catch (Exception $e) {
             throw new \RuntimeException($e);
         }
-
     }
 
     // Add Staff Contact
@@ -1263,7 +1282,7 @@ class StaffService
                 $data = $data->get();
                 return fractal()->collection($data)->transformWith(new AppointmentDataTransformer())->toArray();
             } else {
-                $data = $data->paginate(env('PER_PAGE',20));
+                $data = $data->paginate(env('PER_PAGE', 20));
                 return fractal()->collection($data)->transformWith(new AppointmentDataTransformer())->paginateWith(new IlluminatePaginatorAdapter($data))->toArray();
             }
         } catch (Exception $e) {
@@ -1333,7 +1352,7 @@ class StaffService
                 $data = $data->where('appointments.patientId', $patientId)->get();
                 return fractal()->collection($data)->transformWith(new AppointmentDataTransformer())->toArray();
             } else {
-                $data = $data->paginate(env('PER_PAGE',20));
+                $data = $data->paginate(env('PER_PAGE', 20));
                 return fractal()->collection($data)->transformWith(new AppointmentDataTransformer())->paginateWith(new IlluminatePaginatorAdapter($data))->toArray();
             }
         } catch (Exception $e) {
@@ -1636,6 +1655,39 @@ class StaffService
             $staffId = Helper::tableName('App\Models\Staff\Staff', $id);
             $data = StaffGroup::select('staffGroups.*')->where('staffGroups.staffId', $staffId)->get();
             return fractal()->collection($data)->transformWith(new GroupStaffTransformer())->toArray();
+        } catch (\Exception $e) {
+            throw new \RuntimeException($e);
+        }
+    }
+
+    // Staff Client Locations
+    public function locationGet($request)
+    {
+        try {
+            $listData = array();
+            $site = Site::with('state');
+            $siteHead = Site::where(['siteHead' => Auth::id()])->first();
+            if (auth()->user()->roleId == 2) {
+                $client = Staff::where(['userId' => Auth::id()])->get('clientId');
+                $careTeam = CareTeam::whereIn('clientId', $client)->get('siteId');
+                $site->whereIn('sites.udid', $careTeam);
+            } elseif (auth()->user()->roleId == 5 || auth()->user()->roleId == 7 || auth()->user()->roleId == 9) {
+                if ($siteHead) {
+                    $site->where(['siteHead' => Auth::id()]);
+                } else {
+                    $careTeamMember = CareTeamMember::where(['contactId' => Auth::id()])->get('careTeamId');
+                    $careTeam = CareTeam::whereIn('udid', $careTeamMember)->get('siteId');
+                    $site->whereIn('sites.udid', $careTeam);
+                }
+            } else {
+                $site;
+            }
+            $site = $site->get();
+            foreach ($site as $key => $people) {
+                $listData[$key]['udid'] = $people->udid;
+                $listData[$key]['name'] = $people->friendlyName;
+            }
+            return response()->json(['data' => $listData], 200);
         } catch (\Exception $e) {
             throw new \RuntimeException($e);
         }

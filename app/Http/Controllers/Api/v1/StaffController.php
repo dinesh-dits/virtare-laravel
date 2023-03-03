@@ -244,4 +244,10 @@ class StaffController extends Controller
     {
         return (new StaffService)->staffGroupList($request, $id, $groupId);
     }
+
+    //Staff Client Locations
+    public function getLocation(Request $request)
+    {
+        return (new StaffService)->locationGet($request);
+    }
 }
