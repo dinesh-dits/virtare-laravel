@@ -322,7 +322,7 @@ class GlobalCodeService
             if (!empty($request->timelineId)) {
                 $timelineId = $request->timelineId;
             }
-            $data = DB::select('CALL getGlobalStartEndDate(' . (int)$timelineId . ')');
+            $data = DB::select('CALL getGlobalStartEndDate("' . $timelineId . '")');
             if (isset($request->timelineId) && isset($data[0])) {
                 return fractal()->item($data[0])->transformWith(new GlobalStartEndDateTransformer())->toArray();
             } else {

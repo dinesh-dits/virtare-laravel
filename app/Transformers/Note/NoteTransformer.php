@@ -34,7 +34,7 @@ class NoteTransformer extends TransformerAbstract
             'addedBy' => $data->addedBy?$data->addedBy:'',
             'addedById' => (!empty($data->addedById)) ? $data->addedById :'',
             'addedByType' => (!empty($data->addedByType)) ? $data->addedByType : '',
-            'profilePhoto' => (!empty(@$data->profilePhoto)) && (!is_null(@$data->profilePhoto)) ? str_replace("public", "", URL::to('/')) . '/' . @$data->profilePhoto : (!empty(@$data->profilePhoto)) && (!is_null(@$data->profilePhoto)) ? str_replace("public", "", URL::to('/')) . '/' . @$data->user->profilePhoto : '',
+            'profilePhoto' => (!empty(@$data->profilePhoto)) && (!is_null(@$data->profilePhoto)) ? str_replace("public", "", URL::to('/')) . '/' . @$data->profilePhoto : ((!empty(@$data->profilePhoto)) && (!is_null(@$data->profilePhoto)) ? str_replace("public", "", URL::to('/')) . '/' . @$data->user->profilePhoto : ''),
             'specialization' => (!empty(@$data->specialization)) ? @$data->specialization : @$data->user->staff->specialization->name,
             'color'=>(!(empty($data->flagColor)))?$data->flagColor:'',
             'icon'=>(!(empty($data->flagIcon)))?$data->flagIcon:'',

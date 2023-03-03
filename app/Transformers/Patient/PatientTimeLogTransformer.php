@@ -18,7 +18,7 @@ class PatientTimeLogTransformer extends TransformerAbstract
         return [
             'id'=>$data->udid,
             'categoryId'=>(!empty($data->category))?$data->categoryId:'',
-            'category'=>(!empty($data->categoryName))?$data->categoryName:(!empty($data->category))?$data->category->name:'',
+            'category'=>(!empty($data->categoryName))?$data->categoryName:((!empty($data->category))?$data->category->name:''),
             'loggedId'=>$data->loggedId,
             'loggedBy'=>@$data->logged->firstName.' '.@$data->logged->lastName,
             'performedId'=>$data->performedId,

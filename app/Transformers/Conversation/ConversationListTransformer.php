@@ -52,7 +52,7 @@ class ConversationListTransformer extends TransformerAbstract
             'expertise' => (!empty($data->receiver->staff->expertise)) ? $data->receiver->staff->expertise->name : '',
             'designation' => (!empty($data->receiver->staff)) ? @$data->receiver->staff->designation->name : '',
             'specialization' => (!empty($data->receiver->staff)) ? @$data->receiver->staff->specialization->name : '',
-            'receiver' => (!empty($data->receiver->patient)) ? $data->receiver->patient->firstName . ' ' . $data->receiver->patient->lastName : (!empty($data->receiver->staff)) ? @$data->receiver->staff->firstName . ' ' . @$data->receiver->staff->lastName : '',
+            'receiver' => (!empty($data->receiver->patient)) ? $data->receiver->patient->firstName . ' ' . $data->receiver->patient->lastName : ((!empty($data->receiver->staff)) ? @$data->receiver->staff->firstName . ' ' . @$data->receiver->staff->lastName : ''),
             'message' => (!empty($data->conversationMessages->last()->message)) ? $data->conversationMessages->last()->message : '',
             'type' => (!empty($data->conversationMessages->last()->type)) ? $data->conversationMessages->last()->type : '',
             'messageSender' => (!empty($data->conversationMessages->last()->senderId)) ? $data->conversationMessages->last()->senderId : '',

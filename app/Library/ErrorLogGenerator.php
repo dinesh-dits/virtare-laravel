@@ -5,6 +5,7 @@ namespace App\Library;
 use Illuminate\Support\Str;
 use App\Models\ErrorLog\ErrorLog;
 use App\Transformers\ErrorLog\ErrorLogTransformer;
+use Illuminate\Support\Facades\URL;
 
 class ErrorLogGenerator
 {
@@ -12,8 +13,8 @@ class ErrorLogGenerator
     {
         try {
             $udid = Str::uuid()->toString();
-            // getTraceAsString
-            $base = url();
+            
+            $base = URL::to('/');            
             if (!empty($request)) {
                 $requestParameter = json_encode($request->all());
                 $request_url = $base . $request->server("REQUEST_URI");
