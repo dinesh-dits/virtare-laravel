@@ -14,7 +14,7 @@ class StaffRequest extends FormRequest
 
     public function rules()
     {
-        $staff_udid = request()->segment(2);
+        $staff_udid = request()->id;
         if (!empty($staff_udid)) {
             $staff = Staff::where('udid', $staff_udid)->first();
             return [

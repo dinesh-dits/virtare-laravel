@@ -15,7 +15,7 @@ class StaffAvailabilityRequest extends FormRequest
 
     public function rules()
     {
-        $udid = request()->segment(2);
+        $udid = request()->id;
         $staff = Staff::where('udid', $udid)->first();
         
         return [

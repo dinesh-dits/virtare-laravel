@@ -15,7 +15,7 @@ class StaffContactRequest extends FormRequest
 
     public function rules()
     {
-        $udid = request()->segment(4);
+        $udid = request()->segment(5);
         $staff = StaffContact::where('udid', $udid)->first();
         if ($staff) {
             return [
