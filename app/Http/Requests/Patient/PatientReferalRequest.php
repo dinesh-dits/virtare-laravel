@@ -14,7 +14,7 @@ class PatientReferalRequest extends FormRequest
 
     public function rules()
     {
-        $id = request()->segment(4);
+        $id = request()->referalsId;        
         $email = PatientReferral::where('udid', $id)->first();
         if ($email) {
             return [

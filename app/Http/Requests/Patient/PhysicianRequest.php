@@ -14,7 +14,7 @@ class PhysicianRequest extends FormRequest
 
     public function rules()
     {
-        $id = request()->segment(4);
+        $id = request()->physicianId;        
         if (!empty($id)) {
             $patient = PatientPhysician::where('udid', $id)->first();
             if ($patient) {

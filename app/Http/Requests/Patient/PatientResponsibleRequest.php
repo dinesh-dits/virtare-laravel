@@ -14,7 +14,7 @@ class PatientResponsibleRequest extends FormRequest
 
     public function rules()
     {
-        // $patient = request()->segment(2);
+        // $patient = request()->id;        
         // if($patient){
         //     $responsible = PatientResponsible::where('udid', $patient)->first();
         //     // dd($responsible['patientResponsibleId']);

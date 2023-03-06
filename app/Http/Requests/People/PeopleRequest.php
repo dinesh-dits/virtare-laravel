@@ -26,7 +26,7 @@ class PeopleRequest extends FormRequest
 
     public function rules()
     {
-        $udid = request()->segment(3);
+        $udid = request()->id;        
         if (!empty($udid)) {
             $staff = Staff::where('udid', $udid)->first();
             $other = [];

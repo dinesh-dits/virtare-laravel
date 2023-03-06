@@ -1059,7 +1059,7 @@ class PatientService
             $referal['providerId'] = $provider;
             $referal['providerLocationId'] = $providerLocation;
             $patient = PatientReferral::where('udid', $referalsId)->update($referal);
-            $input = Helper::tableName('App\Models\Patient\PatientReferal', $referalsId);
+            $input = Helper::tableName('App\Models\Patient\PatientReferral', $referalsId);
             $changeLog = [
                 'udid' => Str::uuid()->toString(), 'table' => 'patientReferals', 'tableId' => $input, 'providerId' => $provider, 'providerLocationId' => $providerLocation,
                 'value' => json_encode($referal), 'type' => 'updated', 'ip' => request()->ip(), 'createdBy' => Auth::id()
