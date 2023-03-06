@@ -16,8 +16,8 @@ class PatientFamilymemberRequest extends FormRequest
     public function rules()
     {
 
-        $data = request()->segment(4);
-        $patient = Patient::where('udid', request()->segment(2))->first();
+        $data = request()->familyId;
+        $patient = Patient::where('udid', request()->id)->first();
         $family = User::where([['email', request()->familyEmail], ['roleId', 6]])->whereHas('familyMember', function ($query) use ($patient) {
             $query->where('patientId', $patient->id);
         })->first();

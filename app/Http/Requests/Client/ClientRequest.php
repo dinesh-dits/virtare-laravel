@@ -25,8 +25,8 @@ class ClientRequest extends FormRequest
      */
 
     public function rules()
-    {
-        if (request()->segment(3)) {
+    {        
+        if (request()->id) {
             $other = [];
         } else {
             $other = [
