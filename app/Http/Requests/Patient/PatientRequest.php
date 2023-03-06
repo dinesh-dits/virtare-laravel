@@ -19,7 +19,7 @@ class PatientRequest extends FormRequest
     public function rules()
     {
 
-        $patient_udid = request()->segment(2);
+        $patient_udid = request()->id;
         $post = request()->all();
         if (!empty($patient_udid)) {
             $patient = Patient::where('udid', $patient_udid)->first();

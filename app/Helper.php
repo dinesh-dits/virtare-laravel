@@ -291,8 +291,9 @@ class Helper
         </document>
         <?php
         $contents = ob_get_contents();
-        ob_end_clean();
-        $directory = fopen(env('FILE_STORAGE') . "/public/directory.xml", "w") or die("Unable to open file!");
+        ob_end_clean();   
+        // $directory = fopen(env('FILE_STORAGE') . "/public/directory.xml", "w") or die("Unable to open file!");
+        $directory = fopen(storage_path('app/public/directory.xml'), "w") or die("Unable to open file!");
         fwrite($directory, $contents);
         fclose($directory);
     }
@@ -358,7 +359,8 @@ class Helper
         <?php
         $contents = ob_get_contents();
         ob_end_clean();
-        $directory = fopen(env('FILE_STORAGE') . "/public/dialplan.xml", "w") or die("Unable to open file!");
+        // $directory = fopen(env('FILE_STORAGE') . "/public/dialplan.xml", "w") or die("Unable to open file!");
+        $directory = fopen(storage_path('app/public/dialplan.xml'), "w") or die("Unable to open file!");
         fwrite($directory, $contents);
         fclose($directory);
     }
