@@ -33,7 +33,7 @@ class PeopleService
             $client = Helper::tableName('App\Models\Client\Client', $request->input('clientId'));
             if (isset($client) && !empty($client)) {
                 if (isset($roleDetail->id) && !empty($roleDetail->id)) {
-                    if ($roleDetail->id == 11) {
+                    if ($roleDetail->id == 47) { // Non system user
                         $clientService = new ClientService();
                         $contactId = $clientService->contactAdd($request, $request->input('clientId'));
                     } else {

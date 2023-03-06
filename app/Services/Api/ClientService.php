@@ -76,7 +76,7 @@ class ClientService
                 $timeZone = Timezone::where('udid', $contactPerson['timeZoneId'])->first();
                 if (isset($clientData->id) && !empty($clientData->id)) {
                     if (isset($roleDetail->id) && !empty($roleDetail->id)) {
-                        if ($roleDetail->id == 11) {
+                        if ($roleDetail->id == 47) {  // Not System User
                             $clientService = new ClientService();
                             $clientService->contactAdd($request, $clientData->id);
                         } else {
@@ -160,7 +160,7 @@ class ClientService
                 $timeZone = Timezone::where('udid', $contactPerson['timeZoneId'])->first();
                 if (isset($clientData->udid) && !empty($clientData->udid)) {
                     if (isset($roleDetail->id) && !empty($roleDetail->id)) {
-                        if ($roleDetail->id == 11) {
+                        if ($roleDetail->id == 47) { // Non system user
                             $clientService = new ClientService();
                             $clientService->contactAdd($request, $clientData->udid);
                         } else {
@@ -592,7 +592,7 @@ class ClientService
                 $address[0]['name'] = 'add new address';
             }
             $key++;
-            $address[$key]['fullAddress'] = $value['addressLine1'] . ', ' . $value['city'] . ', ' . $value['state']['iso'] . '-' . $value['zipCode'];
+            $address[$key]['fullAddress'] = $value['addressLine1'] . ((!empty($value['addressLine2']) ? ', ' : '')) . $value['addressLine2'] . ', ' . $value['city'] . ', ' . $value['state']['iso'] . '- ' . $value['zipCode']; 
             $address[$key]['fullAddressOnHover'] = $value['addressLine1'] . ((!empty($value['addressLine2']) ? ', ' : '')) . $value['addressLine2'] . ', ' . $value['city'] . ', ' . $value['state']['iso'] . ', ' . $value['zipCode'];
             $address[$key]['addressLine1'] = $value['addressLine1'];
             $address[$key]['addressLine2'] = $value['addressLine2'];

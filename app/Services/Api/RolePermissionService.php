@@ -30,7 +30,7 @@ class RolePermissionService
             $roles = Role::all();
             $rolesData = array();
             $i=0;
-         /*   foreach($roles as $key=>$role){
+          /*  foreach($roles as $key=>$role){
                $role = Role::find($role->id);
                $role->update(['udid'=>Str::uuid()->toString()]);
                $role->save();
@@ -103,8 +103,8 @@ class RolePermissionService
             // }
             if (!$id) {
                 $data->select('accessRoles.*')
-                    ->leftJoin('globalCodes as g1', 'g1.id', '=', 'accessRoles.roleTypeId')
-                    ->leftJoin('globalCodes as g2', 'g2.id', '=', 'accessRoles.levelId');
+                    ->leftJoin('globalCodes as g1', 'g1.id', '=', 'accessRoles.roleTypeId');
+                   // ->leftJoin('globalCodes as g2', 'g2.id', '=', 'accessRoles.levelId');
                 if ($request->search) {
                     $data->where([['accessRoles.roles', 'LIKE', '%' . $request->search . '%']])
                         ->orWhere([['g1.name', 'LIKE', '%' . $request->search . '%']])

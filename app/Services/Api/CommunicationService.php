@@ -777,7 +777,7 @@ class CommunicationService
             if ($request->status == 'start') {
                 $callRecordUpdate = ['callStatusId' => 48, 'updatedBy' => Auth::id(), 'providerId' => $provider, 'providerLocationId' => $providerLocation];
                 CommunicationCallRecord::where('id', $callRecord->id)->update($callRecordUpdate);
-            } else {
+            } elseif ($request->status == 'complete') {
                 $callRecordUpdate = ['callStatusId' => 49, 'updatedBy' => Auth::id(), 'providerId' => $provider, 'providerLocationId' => $providerLocation];
                 CommunicationCallRecord::where('id', $callRecord->id)->update($callRecordUpdate);
             }

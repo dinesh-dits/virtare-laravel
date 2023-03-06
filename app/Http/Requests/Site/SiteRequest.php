@@ -27,10 +27,12 @@ class SiteRequest extends FormRequest
     {
         return [
             'friendlyName'=> 'required',
-            'address.stateId'=> 'required_if:virtual,==,false',
-            'address.city'=> 'required_if:virtual,==,false',
-            'address.zipCode'=>'required_if:virtual,==,false',
-            'address.addressLine1'=> 'required_if:virtual,==,false',
+            'programs'=>'required',
+            'siteHeadId'=>'required',
+            'address.stateId'=> 'required_if:virtual,==,2',
+            'address.city'=> 'required_if:virtual,==,2',
+            'address.zipCode'=>'required_if:virtual,==,2',
+            'address.addressLine1'=> 'required_if:virtual,==,2',
         ];
     }
 
@@ -38,6 +40,8 @@ class SiteRequest extends FormRequest
     {
         return [
             'friendlyName.required' => 'Required',
+            'programs.required' => 'Required',
+            'siteHeadId.required' => 'Required',
             'address.stateId.required_if' => 'Required',
             'address.city.required_if' => 'Required',
             'address.zipCode.required_if' => 'Required',

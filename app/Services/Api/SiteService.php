@@ -38,7 +38,7 @@ class SiteService
                     $timeZone = Timezone::where('udid', $contactPerson['timeZoneId'])->first();
                     if (isset($clientDetail->id) && !empty($clientDetail->id)) {
                         if (isset($roleDetail->id) && !empty($roleDetail->id)) {
-                            if ($roleDetail->id == 11) {
+                            if ($roleDetail->id == 47) { // Non system user
                                 $contactId = new ClientService();
                                 $contactId = $contactId->contactAdd($request, $id);
                             } else {
@@ -164,7 +164,7 @@ class SiteService
                     $clientDetail = Client::where('udid', $id)->first();
                     if (isset($clientDetail->id) && !empty($clientDetail->id)) {
                         if (isset($roleDetail->id) && !empty($roleDetail->id)) {
-                            if ($roleDetail->id == 11) {
+                            if ($roleDetail->id == 47) { // Non system user
                                 $contactId = new ClientService();
                                 $contactId = $contactId->contactAdd($request, $id);
                             } else {

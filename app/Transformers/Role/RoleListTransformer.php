@@ -37,7 +37,7 @@ class RoleListTransformer extends TransformerAbstract
             'udid' => $data->udid,
             'name' => $data->roles,
             'description' => $data->roleDescription,
-            'roleType' => $data->roleType->name,
+            'roleType' => '',//$data->roleType->name,
             'isActive' => $data->isActive,
             'levelId' => $data->levelId,
             'level' => (!empty($data->level)) ? $data->level->name : '',
