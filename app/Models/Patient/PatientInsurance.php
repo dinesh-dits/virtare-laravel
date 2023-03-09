@@ -34,5 +34,10 @@ class PatientInsurance extends Model
     {
         return $this->belongsTo(Patient::class, 'patientId');
     }
+
+    public function insuranceAdd(array $data)
+    {
+        return self::create($data);
+    }
     
 }

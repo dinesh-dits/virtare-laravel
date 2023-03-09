@@ -45,4 +45,71 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
+    public function render($request, Throwable $e)
+    {
+        if ($request->is('api/*')) {
+            // return response()->json([
+            //     'message' => 'Record not found.'
+            // ], 404);
+            return $this->handleApiException($request, $e);
+        }
+        return parent::render($request, $e);
+    }
+
+
+    private function handleApiException($request, $e): \Illuminate\Http\JsonResponse
+    {
+        if ($e instanceof HttpResponseException) {
+            $e = $e->getResponse();
+        }
+
+        if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+            $e = $this->unauthenticated($request, $e);
+        }
+
+        if ($e instanceof \Illuminate\Validation\ValidationException) {
+            return response()->json($e->errors(), 422);
+        }
+
+        return $this->customApiResponse($e);
+    }
+
+    private function customApiResponse($e): \Illuminate\Http\JsonResponse
+    {
+        if (method_exists($e, 'getStatusCode')) {
+            $statusCode = $e->getStatusCode();
+        } else {
+            $statusCode = 500;
+        }
+        $response = [];
+        switch ($statusCode) {
+            case 401:
+                $response['message'] = 'Unauthorized';
+                break;
+            case 403:
+                $response['message'] = 'Forbidden';
+                break;
+            case 404:
+                $response['message'] = 'Not Found';
+                break;
+            case 405:
+                $response['message'] = 'Method Not Allowed';
+                break;
+            case 422:
+                $response['message'] = $e->original['message'];
+                $response['errors'] = $e->original['errors'];
+                break;
+            default:
+                $response['message'] = ($statusCode === 500) ? 'Whoops, looks like something went wrong' : $e->getMessage();
+                break;
+        }
+        if (config('app.debug')) {
+            //$response['trace'] = $e->getTrace();
+            $response['code'] = $e->getCode();
+        }
+        $response['status'] = $statusCode;
+        $response['error'] = $e->getMessage().' \n File :'.$e->getFile().' \n Line :'.$e->getLine();
+        return response()->json($response, $statusCode);
+    }
 }

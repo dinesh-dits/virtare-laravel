@@ -21,12 +21,19 @@ class PatientProvider extends Model
     {
         return  $this->belongsTo(Provider::class, 'providerId');
     }
+
     public function patients()
     {
         return  $this->belongsTo(Patient::class, 'patientId');
     }
+
     public function careteam()
     {
         return  $this->belongsTo(CareTeam::class, 'providerId','udid');
+    }
+
+    public function careTeamAdd(array $data)
+    {
+        return self::create($data);
     }
 }

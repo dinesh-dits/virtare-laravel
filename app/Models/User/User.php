@@ -2,6 +2,8 @@
 
 namespace App\Models\User;
 
+use App\Models\Address\Address;	
+use App\Models\Contact\Contact;
 use Carbon\Carbon;
 use App\Models\Role\Role;
 use App\Models\Staff\Staff;
@@ -9,6 +11,9 @@ use App\Models\Patient\Patient;
 use App\Models\Dashboard\Timezone;
 use App\Models\Patient\PatientPhysician;
 use App\Models\Patient\PatientFamilyMember;
+use App\Models\Patient\PatientInsurance;	
+use App\Models\Patient\PatientProvider;	
+use App\Models\PatientNew\PatientDetail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -98,4 +103,25 @@ class User extends Authenticatable implements JWTSubject, AuthenticatableContrac
 	{
 		return $this->hasOne(Timezone::class,'id', 'timeZoneId');
 	}
+
+    public function patientDetail()	
+    {	
+        return $this->hasOne(PatientDetail::class, 'userId', 'udid');	
+    }	
+    public function address()	
+    {	
+        return $this->hasOne(Address::class, 'udid', 'userId');	
+    }	
+    public function insurance()	
+    {	
+        return $this->hasOne(PatientInsurance::class, 'udid', 'patientId');	
+    }	
+    public function contact()	
+    {	
+        return $this->hasOne(Contact::class, 'referenceId', 'udid');	
+    }	
+    public function careTeam()	
+    {	
+        return $this->hasOne(PatientProvider::class, 'udid', 'patientId');	
+    }
 }

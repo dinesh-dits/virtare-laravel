@@ -117,6 +117,13 @@ Route::post('webhook/blackboxnew', 'Api\v1\WebhookNewController@addBlackbox');
 Route::post('login', 'Api\v1\AuthController@login');
 Route::post('refreshToken', 'Api\v1\AuthController@refreshToken');
 Route::group(['middleware' => 'auth:api'], function () use ($router) {
+    // Patient New Routes
+    Route::group(['prefix' => 'patientData', 'as' => 'patient.'], function () use ($router) {
+        Route::post('create', 'Api\v1\PatientNewController@addPatient');
+        Route::get('list/{id?}', 'Api\v1\PatientNewController@listPatient');
+        Route::put('update/{id}', 'Api\v1\PatientNewController@updatePatient');
+        Route::delete('delete/{id}', 'Api\v1\PatientNewController@deletePatient');
+    });
     /* Custom FORM -SS*/
     Route::post('save-form', 'Api\v1\CustomFormController@saveForm');
     Route::get('custom-forms', 'Api\v1\CustomFormController@getAllForms');
