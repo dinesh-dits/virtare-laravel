@@ -13,14 +13,13 @@ use App\Models\Patient\Patient;
 use App\Events\SetUpPasswordEvent;
 use App\Models\Dashboard\Timezone;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Models\Patient\PatientProvider;
 use App\Models\Patient\PatientTimeLine;
 use App\Models\Patient\PatientInsurance;
 use App\Models\PatientNew\PatientDetail;
-use App\Models\ConfigMessage\ConfigMessage;
 use App\Transformers\PatientNew\PatientNewTransformer;
 use App\Transformers\PatientNew\PatientNewDetailTransformer;
+use Carbon\Carbon;
 
 class PatientNewService
 {
@@ -496,23 +495,43 @@ class PatientNewService
     // Delete Patient
     public function patientDelete($request, $id)
     {
-        $data = $this->inputRequest();
-        $tables = [
-            User::where('udid', $id),
-            PatientDetail::where('userId', $id),
-            Contact::where(['referenceId' => $id, 'entityType' => 'Patient']),
-            PatientInsurance::where(['patientId' => $id]),
-        ];
-        foreach ($tables as $table) {
-            $table->update($data);
+        try {
+            $data = $this->inputRequest();
+            $tables = [
+                User::where('udid', $id),
+                PatientDetail::where('userId', $id),
+                Contact::where(['referenceId' => $id, 'entityType' => 'Patient']),
+                PatientInsurance::where(['patientId' => $id]),
+                Address::where(['userId' => $id]),
+            ];
+            foreach ($tables as $table) {
+                $table->update($data);
+            }
+            return response()->json(['message' => trans('messages.deletedSuccesfully')]);
+        } catch (Exception $e) {
+            throw new \RuntimeException($e);
         }
-        return response()->json(['message' => trans('messages.deletedSuccesfully')]);
     }
 
-    // Common Function 
+    // Common Function of delete input
     public function inputRequest()
     {
-        $input = ['isActive' => 0, 'isDelete' => 1, 'deletedBy' => Auth::id()];
-        return $input;
+        try {
+            $input = ['isActive' => 0, 'isDelete' => 1, 'deletedBy' => Auth::id(), 'deletedAt' => Carbon::now()];
+            return $input;
+        } catch (Exception $e) {
+            throw new \RuntimeException($e);
+        }
     }
+
+
+    // Get Assigned Inventory to Patient
+    // public function inventoryPatientAssign($request,$id)
+    // {
+    //     try {
+    //        $inventory=PatientInventory
+    //     } catch (Exception $e) {
+    //         throw new \RuntimeException($e);
+    //     }
+    // }
 }

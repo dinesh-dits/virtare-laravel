@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\v1;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Services\Api\InventoryService;
-use App\Services\Api\PdfGeneratorService;
 use App\Services\Api\ExcelGeneratorService;
 use App\Services\Api\ExportReportRequestService;
 
@@ -60,4 +59,10 @@ class InventoryController extends Controller
             return response()->json(['message' => "invalid URL."], 400);
         }
     }
-}
+
+    // List Device Model
+    public function getManufacture(Request $request)
+    {
+        return (new InventoryService)->manufactureGet($request);
+    }
+} 

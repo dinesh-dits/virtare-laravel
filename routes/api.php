@@ -123,7 +123,10 @@ Route::group(['middleware' => 'auth:api'], function () use ($router) {
         Route::get('list/{id?}', 'Api\v1\PatientNewController@listPatient');
         Route::put('update/{id}', 'Api\v1\PatientNewController@updatePatient');
         Route::delete('delete/{id}', 'Api\v1\PatientNewController@deletePatient');
+        Route::post('{id}/inventory', 'Api\v1\PatientNewController@assignInventoryPatient');
+        Route::post('{id}/inventory', 'Api\v1\PatientNewController@assignInventoryPatient');
     });
+    Route::get('serialNumber', 'Api\v1\InventoryController@getManufacture');
     /* Custom FORM -SS*/
     Route::post('save-form', 'Api\v1\CustomFormController@saveForm');
     Route::get('custom-forms', 'Api\v1\CustomFormController@getAllForms');

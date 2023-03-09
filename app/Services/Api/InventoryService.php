@@ -2,11 +2,11 @@
 
 namespace App\Services\Api;
 
-use App\Models\Device\DeviceModel;
 use Exception;
 use App\Helper;
 use Illuminate\Support\Str;
 use App\Models\Log\ChangeLog;
+use App\Models\Device\DeviceModel;
 use Illuminate\Support\Facades\DB;
 use App\Models\Inventory\Inventory;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +14,7 @@ use App\Transformers\Device\DeviceModelTransformer;
 use App\Transformers\Inventory\InventoryTransformer;
 use App\Transformers\Inventory\InventoryListTransformer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use App\Transformers\Inventory\InventorySerialTransformer;
 
 class InventoryService
 {
@@ -61,7 +62,7 @@ class InventoryService
                 ->leftJoin('patientInventories', 'patientInventories.inventoryId', '=', 'inventories.id')
                 ->leftJoin('patients', 'patients.id', '=', 'patientInventories.patientId');
 
-      /*      $data->leftJoin('providers', 'providers.id', '=', 'inventories.providerId')->where('providers.isActive', 1)->whereNull('providers.deletedAt');
+            /*      $data->leftJoin('providers', 'providers.id', '=', 'inventories.providerId')->where('providers.isActive', 1)->whereNull('providers.deletedAt');
             $data->leftJoin('programs', 'programs.id', '=', 'inventories.programId')->where('programs.isActive', 1)->whereNull('programs.deletedAt');
 
             $data->leftJoin('providerLocations', function ($join) {
@@ -95,7 +96,7 @@ class InventoryService
                         ->orWhere(DB::raw("CONCAT(trim(`patients`.`firstName`), ' ', trim(`patients`.`lastName`))"), 'LIKE', "%" . $request->search . "%");
                 });
             }
-           /* if (request()->header('providerId')) {
+            /* if (request()->header('providerId')) {
                 $provider = Helper::providerId();
                 $data->where('inventories.providerId', $provider);
             }
@@ -321,5 +322,15 @@ class InventoryService
             $data['deviceModelId'] = $request->manufactureId;
         }
         return $data;
+    }
+
+    public function manufactureGet($request)
+    {
+        try {
+            $data = Inventory::where(['manufactureId' => $request->manufactureId,'deviceId'=>$request->deviceId])->get();
+            return fractal()->collection($data)->transformWith(new InventorySerialTransformer())->toArray();
+        } catch (Exception $e) {
+            throw new \RuntimeException($e);
+        }
     }
 }
