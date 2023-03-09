@@ -21,15 +21,16 @@ class AccessRoleController extends Controller
     }
 
     // Assigned Role Action Staff
-    public function assignedRoleAction( Request $request,$id = null)
+    public function assignedRoleAction(Request $request, $id = null )
     {
-        return (new AccessRoleService)->assignedRoleAction($id, $request);
+      
+        return (new AccessRoleService)->assignedRoleAction($request,$id) ;
     }
 
     // Assigned Role Action Group
-    public function assignedRoleActionGroup(Request $request,$id = null)
+    public function assignedRoleActionGroup(Request $request, $id = null)
     {
-        return (new AccessRoleService)->assignedRoleActionGroup($id, $request);
+        return (new AccessRoleService)->assignedRoleActionGroup($request, $id);
     }
 
     // Merge Permission

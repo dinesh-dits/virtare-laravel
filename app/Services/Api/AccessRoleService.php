@@ -103,7 +103,7 @@ class AccessRoleService
     }
 
     // List Assigned Role Action Group
-    public function assignedRoleActionGroup($id, $request)
+    public function assignedRoleActionGroup($request, $id)
     {
         try {
             $group = Group::where('udid', $id)->first();
