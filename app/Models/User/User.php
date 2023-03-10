@@ -2,33 +2,35 @@
 
 namespace App\Models\User;
 
-use App\Models\Address\Address;	
+use App\Models\Address\Address;
 use App\Models\Contact\Contact;
 use Carbon\Carbon;
 use App\Models\Role\Role;
 use App\Models\Staff\Staff;
 use App\Models\Patient\Patient;
 use App\Models\Dashboard\Timezone;
+use Illuminate\Auth\Authenticatable;
+use Laravel\Lumen\Auth\Authorizable;
+use Illuminate\Database\Eloquent\Model;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Models\Patient\PatientPhysician;
 use App\Models\Patient\PatientFamilyMember;
-use App\Models\Patient\PatientInsurance;	
-use App\Models\Patient\PatientProvider;	
+use App\Models\Patient\PatientInsurance;
+use App\Models\Patient\PatientProvider;
 use App\Models\PatientNew\PatientDetail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements JWTSubject, AuthenticatableContract, AuthorizableContract
+class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use HasFactory, Notifiable, SoftDeletes; 
-    
+    use Authenticatable, Authorizable, HasFactory;
+
+    use SoftDeletes;
     protected $softDelete = true;
     const DELETED_AT = 'deletedAt';
-    public $timestamps = false;
+    public $timestamps = true;
 
     /**
      * The attributes that are mass assignable.
@@ -93,35 +95,39 @@ class User extends Authenticatable implements JWTSubject, AuthenticatableContrac
     }
 
     // Update Staff 
-	public function updateUser($id, array $user)
+    public function updateUser($id, array $user)
     {
         return self::where(['id' => $id])->update($user);
     }
 
     // timeZone
-	public function timeZone()
-	{
-		return $this->hasOne(Timezone::class,'id', 'timeZoneId');
-	}
+    public function timeZone()
+    {
+        return $this->hasOne(Timezone::class, 'id', 'timeZoneId');
+    }
 
-    public function patientDetail()	
-    {	
-        return $this->hasOne(PatientDetail::class, 'userId', 'udid');	
-    }	
-    public function address()	
-    {	
-        return $this->hasOne(Address::class, 'udid', 'userId');	
-    }	
-    public function insurance()	
-    {	
-        return $this->hasOne(PatientInsurance::class, 'udid', 'patientId');	
-    }	
-    public function contact()	
-    {	
-        return $this->hasOne(Contact::class, 'referenceId', 'udid');	
-    }	
-    public function careTeam()	
-    {	
-        return $this->hasOne(PatientProvider::class, 'udid', 'patientId');	
+    public function patientDetail()
+    {
+        return $this->hasOne(PatientDetail::class, 'userId', 'udid');
+    }
+
+    public function address()
+    {
+        return $this->hasOne(Address::class, 'udid', 'userId');
+    }
+
+    public function insurance()
+    {
+        return $this->hasOne(PatientInsurance::class, 'udid', 'patientId');
+    }
+
+    public function contact()
+    {
+        return $this->hasOne(Contact::class, 'referenceId', 'udid');
+    }
+
+    public function careTeam()
+    {
+        return $this->hasOne(PatientProvider::class, 'udid', 'patientId');
     }
 }

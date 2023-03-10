@@ -38,6 +38,11 @@ class Inventory extends Model
         return $this->hasOne(GlobalCode::class, 'id', 'manufactureId');
     }
 
+    public function device()
+    {
+        return $this->hasOne(GlobalCode::class, 'id', 'deviceId');
+    }
+
     public function network()
     {
         return $this->hasOne(GlobalCode::class, 'id', 'networkId');

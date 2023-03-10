@@ -124,7 +124,8 @@ Route::group(['middleware' => 'auth:api'], function () use ($router) {
         Route::put('update/{id}', 'Api\v1\PatientNewController@updatePatient');
         Route::delete('delete/{id}', 'Api\v1\PatientNewController@deletePatient');
         Route::post('{id}/inventory', 'Api\v1\PatientNewController@assignInventoryPatient');
-        Route::post('{id}/inventory', 'Api\v1\PatientNewController@assignInventoryPatient');
+        Route::get('{id}/inventory/{inventoryId?}', 'Api\v1\PatientNewController@getPatientInventory');
+        Route::delete('{id}/inventory/{inventoryId}', 'Api\v1\PatientNewController@deletePatientInventory');
     });
     Route::get('serialNumber', 'Api\v1\InventoryController@getManufacture');
     /* Custom FORM -SS*/

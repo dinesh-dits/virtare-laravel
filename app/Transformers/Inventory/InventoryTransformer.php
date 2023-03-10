@@ -29,6 +29,8 @@ class InventoryTransformer extends TransformerAbstract
             'manufactureId' => (!empty(@$data->manufacture->id)) ? @$data->manufacture->id : '',
             'manufacture' => (!empty(@$data->manufacture->id)) ? $data->manufacture->name : '',
             'isActive' => $data->isActive ? True : False,
+            'deviceId' => (!empty($data->device)) ? $data->device->id : '',
+            'device' => (!empty($data->device)) ? $data->device->name : '',
             'vitalField' => $data->model->deviceType ?  fractal()->collection($data->model->deviceType->vitalFieldType)->transformWith(new VitalFieldTransformer())->serializeWith(new \Spatie\Fractalistic\ArraySerializer())->toArray() : '',
         ];
     }

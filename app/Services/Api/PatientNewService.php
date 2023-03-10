@@ -4,6 +4,7 @@ namespace App\Services\Api;
 
 use Exception;
 use App\Helper;
+use Carbon\Carbon;
 use App\Models\User\User;
 use Illuminate\Support\Str;
 use App\Models\Log\ChangeLog;
@@ -16,10 +17,14 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Patient\PatientProvider;
 use App\Models\Patient\PatientTimeLine;
 use App\Models\Patient\PatientInsurance;
+use App\Models\Patient\PatientInventory;
+use App\Models\PatientNew\PatientClient;
 use App\Models\PatientNew\PatientDetail;
+use App\Models\ConfigMessage\ConfigMessage;
 use App\Transformers\PatientNew\PatientNewTransformer;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use App\Transformers\PatientNew\PatientNewDetailTransformer;
-use Carbon\Carbon;
+use App\Transformers\PatientNew\PatientInventoryNewTransformer;
 
 class PatientNewService
 {
@@ -55,6 +60,13 @@ class PatientNewService
             if (isset($request->insurance) && !empty($request->input('insurance'))) {
                 $insurance = $this->addInsurance($data, $request);
                 if ($insurance === 0) {
+                    return response()->json(['message' => trans('messages.INTERNAL_ERROR')], 500);
+                }
+            }
+            // Add Patient Client
+            if (isset($request->client) && !empty($request->input('clientId'))) {
+                $client = $this->addClient($data, $request->client);
+                if ($client === 0) {
                     return response()->json(['message' => trans('messages.INTERNAL_ERROR')], 500);
                 }
             }
@@ -237,6 +249,28 @@ class PatientNewService
     }
 
     // Add Patient CareTeam into patientProviders Table
+    public function addClient($id, $data)
+    {
+        try {
+            $data = $this->dataInput();
+            $input = ['clientId' => $data, 'patientId' => $id];
+            $dataClient = array_merge($data, $input);
+            $careTeam = new PatientClient();
+            $careTeam = $careTeam->addPatientClient($dataClient);
+            $changeLog = [
+                'udid' => Str::uuid()->toString(), 'table' => 'patienClients', 'tableId' => $careTeam->id,
+                'value' => json_encode($dataClient), 'type' => 'created', 'ip' => request()->ip(), 'createdBy' => Auth::id(),
+            ];
+            ChangeLog::create($changeLog);
+            if (!$careTeam) {
+                return 0;
+            }
+        } catch (Exception $e) {
+            throw new \RuntimeException($e);
+        }
+    }
+
+    // Add Patient CareTeam into patientProviders Table
     public function addCareTeam($id, $data)
     {
         try {
@@ -262,8 +296,8 @@ class PatientNewService
     {
         try {
             if (!$id) {
-                $patient = User::where(['roleId' => 4])->get();
-                return fractal()->collection($patient)->transformWith(new PatientNewTransformer())->toArray();
+                $patient = User::where(['roleId' => 4])->orderBy('created_at', 'DESC')->paginate(env('PER_PAGE', 20));
+                return fractal()->collection($patient)->transformWith(new PatientNewTransformer())->paginateWith(new IlluminatePaginatorAdapter($patient))->toArray();
             }
             $patient = User::where(['roleId' => 4, 'udid' => $id])->first();
             return fractal()->item($patient)->transformWith(new PatientNewDetailTransformer())->toArray();
@@ -524,14 +558,53 @@ class PatientNewService
         }
     }
 
+    // Assign Inventory to Patient
+    public function inventoryPatientAssign($request, $id)
+    {
+        try {
+            $inventoryId = Helper::tableName('App\Models\Inventory\Inventory', $request->inventoryId);
+            $input = ['patientId' => $id, 'inventoryId' => $inventoryId];
+            $data = $this->dataInput();
+            $result = array_merge($input, $data);
+            $inventory = new PatientInventory();
+            $inventory = $inventory->addInventory($result);
+            return response()->json(['message' => trans('messages.createdSuccesfully')], 201);
+        } catch (Exception $e) {
+            throw new \RuntimeException($e);
+        }
+    }
 
-    // Get Assigned Inventory to Patient
-    // public function inventoryPatientAssign($request,$id)
-    // {
-    //     try {
-    //        $inventory=PatientInventory
-    //     } catch (Exception $e) {
-    //         throw new \RuntimeException($e);
-    //     }
-    // }
+    public function dataInput()
+    {
+        $input = ['udid' => Str::uuid()->toString(), 'createdBy' => Auth::id()];
+        return $input;
+    }
+
+    // Get Inventory to Patient
+    public function patientInventoryGet($request, $id, $inventoryId)
+    {
+        try {
+            $patient = PatientInventory::where(['patientId' => $id]);
+            if (!$inventoryId) {
+                $patient = $patient->orderBy('createdAt', 'DESC')->paginate(env('PER_PAGE', 20));
+                return fractal()->collection($patient)->transformWith(new PatientInventoryNewTransformer())->paginateWith(new IlluminatePaginatorAdapter($patient))->toArray();
+            }
+            $patient = $patient->where(['udid' => $inventoryId])->first();
+            return fractal()->item($patient)->transformWith(new PatientInventoryNewTransformer())->toArray();
+        } catch (Exception $e) {
+            throw new \RuntimeException($e);
+        }
+    }
+
+    // Delete Inventory to Patient
+    public function patientInventoryDelete($request, $id, $inventoryId)
+    {
+        try {
+            $data = $this->inputRequest();
+            PatientInventory::where('udid', $inventoryId)->update($data);
+            return response()->json(['message' => trans('messages.deletedSuccesfully')]);
+        } catch (Exception $e) {
+            throw new \RuntimeException($e);
+        }
+    }
 }

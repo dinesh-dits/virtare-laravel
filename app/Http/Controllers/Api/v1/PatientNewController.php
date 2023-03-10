@@ -29,8 +29,18 @@ class PatientNewController extends Controller
         return (new PatientNewService)->patientDelete($request, $id);
     }
 
-    // public function assignInventoryPatient(Request $request, $id)
-    // {
-    //     return (new PatientNewService)->inventoryPatientAssign($request, $id);
-    // }
+    public function assignInventoryPatient(Request $request, $id)
+    {
+        return (new PatientNewService)->inventoryPatientAssign($request, $id);
+    }
+
+    public function getPatientInventory(Request $request, $id,$inventoryId=null)
+    {
+        return (new PatientNewService)->patientInventoryGet($request, $id,$inventoryId);
+    }
+
+    public function deletePatientInventory(Request $request, $id,$inventoryId)
+    {
+        return (new PatientNewService)->patientInventoryDelete($request, $id,$inventoryId);
+    }
 }

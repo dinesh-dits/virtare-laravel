@@ -13,7 +13,7 @@ class InventorySerialTransformer extends TransformerAbstract
     public function transform($data)
     {
         return [
-            'id' => $data->id,
+            'id' => $data->udid,
             'name' => ($data->serialNumber != NULL) ? $data->serialNumber : $data->macAddress,
         ];
     }

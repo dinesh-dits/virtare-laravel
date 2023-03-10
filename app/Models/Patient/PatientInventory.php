@@ -43,5 +43,8 @@ class PatientInventory extends Model
         return $this->belongsTo(PatientGoal::class,'vitalFieldId');
     }
 
-    
+    public function addInventory(array $data)
+    {
+        return self::create($data);
+    }
 }

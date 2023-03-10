@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Inventory\Inventory;
 use Illuminate\Support\Facades\Auth;
 use App\Transformers\Device\DeviceModelTransformer;
-use App\Transformers\Inventory\InventoryTransformer;
 use App\Transformers\Inventory\InventoryListTransformer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use App\Transformers\Inventory\InventorySerialTransformer;
@@ -37,6 +36,7 @@ class InventoryService
                 'serialNumber' => '',
                 'networkId' => $request->networkId,
                 'deviceModelId' => $deviceModelId->id,
+                'deviceId' => $request->deviceTypeId,
             ];
             //  $data = json_encode(array_merge($input, $otherData));
             $data = json_encode($otherData);
