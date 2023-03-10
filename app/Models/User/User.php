@@ -2,32 +2,25 @@
 
 namespace App\Models\User;
 
-use App\Models\Address\Address;
-use App\Models\Contact\Contact;
 use Carbon\Carbon;
 use App\Models\Role\Role;
 use App\Models\Staff\Staff;
 use App\Models\Patient\Patient;
 use App\Models\Dashboard\Timezone;
-use Illuminate\Auth\Authenticatable;
-use Laravel\Lumen\Auth\Authorizable;
-use Illuminate\Database\Eloquent\Model;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Models\Patient\PatientPhysician;
 use App\Models\Patient\PatientFamilyMember;
-use App\Models\Patient\PatientInsurance;
-use App\Models\Patient\PatientProvider;
-use App\Models\PatientNew\PatientDetail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Model implements JWTSubject, AuthenticatableContract, AuthorizableContract
+class User extends Authenticatable implements JWTSubject, AuthenticatableContract, AuthorizableContract
 {
-    use Authenticatable, Authorizable, HasFactory;
-
-    use SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes;
+    
     protected $softDelete = true;
     const DELETED_AT = 'deletedAt';
     public $timestamps = true;
